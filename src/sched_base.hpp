@@ -28,6 +28,12 @@ public:
           timeline_(simTime, "IDLE")
     {}
 
+    int simTime() const { return simTime_; }
+
+    const std::vector<std::string>& timeline() const {
+        return timeline_;
+    }
+
     virtual ~PeriodicScheduler() = default;
 
     virtual void releaseJobs(int t) {
