@@ -31,25 +31,41 @@ scheduler/
     └── example.in
 ```
 
-## Building the Project:
+## Building the CLI Version
 
-1 - Create build directory
-```
+```bash
 mkdir build && cd build
-```
-
-
-2 - Run CMake
-```
 cmake ..
-```
-
-3 - Compile
-```
 make
-```
-
-4 - Output executable: 
-```
 ./rt_scheduler
 ```
+
+
+
+## Building the Qt GUI Version
+
+### Requirements:
+- Qt 6.x  
+- Qt Widgets
+- Qt Charts
+- Qt Creator recommended
+
+```bash
+cd gui/rt_gui
+mkdir build && cd build
+cmake ..
+make
+./rt_gui
+```
+
+
+
+
+
+
+
+
+
+
+
+
