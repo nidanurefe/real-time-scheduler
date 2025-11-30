@@ -3,6 +3,7 @@
 #include "policies.hpp"
 #include "sched_base.hpp"
 #include "sched_servers.hpp"
+#include "server_rules.hpp"
 #include <memory>
 #include <cctype>
 
@@ -14,40 +15,62 @@ inline std::unique_ptr<PeriodicScheduler> buildScheduler(
     int simTime)
 {
     std::string name = algName;
-    for (auto& c : name) c = std::toupper(c);
+    for (auto &c : name) c = std::toupper(c);
 
-    // Pure periodic algorithms
+    // Read server rules from settings.json
+    ServerRuleConfig rules = loadServerRuleConfig("settings.json");
+
+    // Pure periodic 
     if (name == "RMS" || name == "DMS" || name == "EDF" || name == "LLF") {
         auto policy = makePolicy(name);
-        return std::make_unique<PeriodicScheduler>(tasks, simTime, std::move(policy));
+        return std::unique_ptr<PeriodicScheduler>(
+            new PeriodicScheduler(tasks, simTime, std::move(policy))
+        );
     }
 
-    // Background
+    // Background 
     if (name == "BACKGROUND") {
         auto policy = makePolicy("RMS"); 
-        return std::make_unique<BackgroundScheduler>(tasks, aperiodic, simTime, std::move(policy));
+        return std::unique_ptr<PeriodicScheduler>(
+            new BackgroundScheduler(tasks, aperiodic, simTime, std::move(policy))
+        );
     }
 
-    // Server-based 
+    // Server based 
     if (name == "POLLING") {
-        if (!serverCfg) throw std::runtime_error("Polling Server requires a D line in input.");
+        if (!serverCfg) {
+            throw std::runtime_error("Polling Server requires a D line in input.");
+        }
         auto policy = makePolicy("RMS");
-        return std::make_unique<PollingServerScheduler>(
-            tasks, aperiodic, *serverCfg, simTime, std::move(policy));
+        return std::unique_ptr<PeriodicScheduler>(
+            new PollingServerScheduler(
+                tasks, aperiodic, *serverCfg, simTime,
+                std::move(policy), rules.polling)
+        );
     }
 
     if (name == "DEFERRABLE") {
-        if (!serverCfg) throw std::runtime_error("Deferrable Server requires a D line in input.");
+        if (!serverCfg) {
+            throw std::runtime_error("Deferrable Server requires a D line in input.");
+        }
         auto policy = makePolicy("RMS");
-        return std::make_unique<DeferrableServerScheduler>(
-            tasks, aperiodic, *serverCfg, simTime, std::move(policy));
+        return std::unique_ptr<PeriodicScheduler>(
+            new DeferrableServerScheduler(
+                tasks, aperiodic, *serverCfg, simTime,
+                std::move(policy), rules.deferrable)
+        );
     }
 
     if (name == "SPORADIC") {
-        if (!serverCfg) throw std::runtime_error("Sporadic Server requires a D line in input.");
+        if (!serverCfg) {
+            throw std::runtime_error("Sporadic Server requires a D line in input.");
+        }
         auto policy = makePolicy("RMS");
-        return std::make_unique<SporadicServerScheduler>(
-            tasks, aperiodic, *serverCfg, simTime, std::move(policy));
+        return std::unique_ptr<PeriodicScheduler>(
+            new SporadicServerScheduler(
+                tasks, aperiodic, *serverCfg, simTime,
+                std::move(policy), rules.sporadic)
+        );
     }
 
     throw std::runtime_error("Unknown algorithm: " + algName);

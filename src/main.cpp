@@ -35,7 +35,9 @@ int main() {
         std::cout << "Algorithm: ";
         std::getline(std::cin, alg);
 
+        ServerRuleConfig rules = loadServerRuleConfig("settings.json");
         auto scheduler = buildScheduler(alg, tasks, aperiodic, serverCfg, simTime);
+
         scheduler->run();
         std::cout << "\n" << scheduler->summaryText() << "\n";
 

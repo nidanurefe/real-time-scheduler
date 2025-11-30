@@ -77,7 +77,8 @@ void MainWindow::onRunSimulation()
         std::string alg = ui->comboAlg->currentText().toStdString();
 
         // Scheduler
-        auto scheduler = buildScheduler(alg, tasks, aperiodic, serverCfg, sim);
+        ServerRuleConfig rules = loadServerRuleConfig("settings.json");
+        auto scheduler = buildScheduler(alg, tasks, aperiodic, serverCfg, sim, rules);
 
         // Execute
         scheduler->run();
@@ -99,7 +100,7 @@ void MainWindow::drawTimelineChart(const std::vector<std::string>& timeline)
 {
     if (timeline.empty()) return;
 
-    // 1) Label -> row index
+    // Label -> row index
     std::vector<std::string> labelsOrdered;
     std::unordered_map<std::string, int> labelToRow;
 
@@ -111,7 +112,7 @@ void MainWindow::drawTimelineChart(const std::vector<std::string>& timeline)
         }
     }
 
-    // 2) Chart
+    // Chart
     auto *chart = new QChart();
     chart->setTitle("Schedule Timeline");
     chart->setTitleFont(QFont("SF Pro", 14, QFont::Bold));
@@ -120,27 +121,27 @@ void MainWindow::drawTimelineChart(const std::vector<std::string>& timeline)
     chart->legend()->setFont(QFont("SF Pro", 10));
     chart->legend()->setMarkerShape(QLegend::MarkerShapeFromSeries);
 
-    // Her task için bir series (daha büyük marker, hafif şeffaf)
+    // Series for each task 
     for (const auto &label : labelsOrdered) {
         int row = labelToRow[label];
 
         auto *series = new QScatterSeries();
         series->setName(QString::fromStdString(label));
         series->setMarkerShape(QScatterSeries::MarkerShapeCircle);
-        series->setMarkerSize(14.0);                       // daha büyük noktalar
+        series->setMarkerSize(14.0);                      
         series->setBorderColor(Qt::black);
         series->setOpacity(0.9);
 
         for (int t = 0; t < static_cast<int>(timeline.size()); t++) {
             if (timeline[t] == label) {
-                series->append(t + 0.5, row);              // kolon ortasına kaydır
+                series->append(t + 0.5, row);              
             }
         }
 
         chart->addSeries(series);
     }
 
-    // 3) X ekseni: zaman
+    // X axis: time
     auto *axisX = new QValueAxis();
     axisX->setTitleText("Time");
     axisX->setLabelFormat("%d");
@@ -154,7 +155,7 @@ void MainWindow::drawTimelineChart(const std::vector<std::string>& timeline)
     for (auto *s : chart->series())
         s->attachAxis(axisX);
 
-    // 4) Y ekseni: task isimleri
+    //Y axis: tasks
     auto *axisY = new QCategoryAxis();
     axisY->setTitleText("Task");
     axisY->setGridLineVisible(true);
@@ -170,16 +171,16 @@ void MainWindow::drawTimelineChart(const std::vector<std::string>& timeline)
     for (auto *s : chart->series())
         s->attachAxis(axisY);
 
-    // 5) Eski chartView temizle
+    // Clear old chartView
     if (chartView_) {
         delete chartView_;
         chartView_ = nullptr;
     }
 
-    // 6) Yeni chartView
+    // New chartView
     chartView_ = new QChartView(chart, ui->chartWidget);
     chartView_->setRenderHint(QPainter::Antialiasing);
-    chartView_->setMinimumHeight(350);  // daha büyük alan
+    chartView_->setMinimumHeight(350); 
     chartView_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     QLayout *oldLayout = ui->chartWidget->layout();

@@ -13,3 +13,5 @@ add_executable(rt_scheduler
     src/sched_servers.hpp
     src/factory.hpp
 )
+
+target_include_directories(rt_scheduler PRIVATE thirdparty/json/include)

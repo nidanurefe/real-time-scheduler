@@ -4,9 +4,9 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
-#include <cmath>        // std::round
+#include <cmath>       
 
-// parseInputFile -> (tasks, aperiodicJobs, optional<ServerCfg>)
+
 inline std::tuple<
     std::vector<PeriodicTask>,
     std::vector<AperiodicJob>,
@@ -22,7 +22,7 @@ inline std::tuple<
         throw std::runtime_error("Could not open input file: " + path);
     }
 
-    // helper: double -> int (tick)
+    
     auto toInt = [](double x) {
         return static_cast<int>(std::round(x));
     };

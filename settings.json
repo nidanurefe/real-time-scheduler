@@ -1,0 +1,16 @@
+{
+  "servers": {
+    "POLLING": {
+      "budget_if_aperiodic_ready": true
+    },
+
+    "DEFERRABLE": {
+      "reset_budget_each_period": true
+    },
+
+    "SPORADIC": {
+      "replenish_amount": 1,
+      "replenish_delay_factor": 1.0
+    }
+  }
+}
