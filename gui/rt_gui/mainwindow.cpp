@@ -15,6 +15,8 @@
 #include "../src/factory.hpp"
 #include "../src/models.hpp"
 
+using namespace QtCharts; 
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)

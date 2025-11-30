@@ -25,7 +25,7 @@ private:
     Ui::MainWindow *ui;
 
     // Chart view pointer
-    QChartView *chartView_ = nullptr;   
+    QtCharts::QChartView *chartView_ = nullptr;
 
     // Chart drawing
     void drawTimelineChart(const std::vector<std::string>& timeline);
