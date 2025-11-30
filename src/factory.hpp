@@ -24,7 +24,7 @@ inline std::unique_ptr<PeriodicScheduler> buildScheduler(
 
     // Background
     if (name == "BACKGROUND") {
-        auto policy = makePolicy("RMS");  // periyodikler RMS
+        auto policy = makePolicy("RMS"); 
         return std::make_unique<BackgroundScheduler>(tasks, aperiodic, simTime, std::move(policy));
     }
 

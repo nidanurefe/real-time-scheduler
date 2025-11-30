@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <cmath>        // std::round
 
 // parseInputFile -> (tasks, aperiodicJobs, optional<ServerCfg>)
 inline std::tuple<
@@ -21,18 +22,23 @@ inline std::tuple<
         throw std::runtime_error("Could not open input file: " + path);
     }
 
+    // helper: double -> int (tick)
+    auto toInt = [](double x) {
+        return static_cast<int>(std::round(x));
+    };
+
     std::string raw;
     int lineIdx = 0;
     while (std::getline(in, raw)) {
         ++lineIdx;
 
-        // Inline yorumları (#) temizle
+        // strip comments
         auto sharpPos = raw.find('#');
         if (sharpPos != std::string::npos) {
             raw = raw.substr(0, sharpPos);
         }
 
-        // Trim
+        // trim leading spaces
         std::string line;
         {
             std::stringstream ss(raw);
@@ -44,55 +50,63 @@ inline std::tuple<
         std::stringstream ss(line);
         std::string tag;
         ss >> tag;
-        for (auto& c : tag) c = std::toupper(c);
+        for (auto &c : tag) c = std::toupper(c);
 
         try {
             if (tag == "P") {
                 // P ri ei pi di
                 // P ri ei pi
                 // P ei pi
-                std::vector<int> nums;
-                int v;
+                std::vector<double> nums;
+                double v;
                 while (ss >> v) nums.push_back(v);
 
-                int r_i, e_i, p_i, d_i;
+                double r_d, e_d, p_d, d_d;
                 if (nums.size() == 4) {
-                    r_i = nums[0]; e_i = nums[1]; p_i = nums[2]; d_i = nums[3];
+                    r_d = nums[0]; e_d = nums[1]; p_d = nums[2]; d_d = nums[3];
                 } else if (nums.size() == 3) {
-                    r_i = nums[0]; e_i = nums[1]; p_i = nums[2]; d_i = p_i;
+                    r_d = nums[0]; e_d = nums[1]; p_d = nums[2]; d_d = p_d;
                 } else if (nums.size() == 2) {
-                    e_i = nums[0]; p_i = nums[1]; r_i = 0; d_i = p_i;
+                    e_d = nums[0]; p_d = nums[1]; r_d = 0.0; d_d = p_d;
                 } else {
                     throw std::runtime_error(
                         "P line must be: 'P ri ei pi di' or 'P ri ei pi' or 'P ei pi'"
                     );
                 }
 
+                int r_i = toInt(r_d);
+                int e_i = toInt(e_d);
+                int p_i = toInt(p_d);
+                int d_i = toInt(d_d);
+
                 std::string name = "T" + std::to_string(tasks.size() + 1);
                 tasks.push_back(PeriodicTask{name, r_i, e_i, p_i, d_i});
             }
             else if (tag == "A") {
                 // A ri ei
-                std::vector<int> nums;
-                int v;
+                std::vector<double> nums;
+                double v;
                 while (ss >> v) nums.push_back(v);
                 if (nums.size() != 2) {
                     throw std::runtime_error("A line must be: 'A ri ei'");
                 }
-                int r_i = nums[0];
-                int e_i = nums[1];
+                int r_i = toInt(nums[0]);
+                int e_i = toInt(nums[1]);
                 std::string name = "A" + std::to_string(aperiodic.size() + 1);
                 aperiodic.push_back(AperiodicJob{name, r_i, e_i, e_i});
             }
             else if (tag == "D") {
                 // D ei pi di -> server config
-                std::vector<int> nums;
-                int v;
+                std::vector<double> nums;
+                double v;
                 while (ss >> v) nums.push_back(v);
                 if (nums.size() != 3) {
                     throw std::runtime_error("D line must be: 'D ei pi di'");
                 }
-                serverCfg = ServerCfg{nums[0], nums[1], nums[2]};
+                int Q = toInt(nums[0]);
+                int T = toInt(nums[1]);
+                int D = toInt(nums[2]);
+                serverCfg = ServerCfg{Q, T, D};
             }
             else {
                 throw std::runtime_error("Unknown tag '" + tag + "'");

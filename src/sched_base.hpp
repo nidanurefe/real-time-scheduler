@@ -36,8 +36,9 @@ public:
 
     virtual ~PeriodicScheduler() = default;
 
+    // integer time steps
     virtual void releaseJobs(int t) {
-        for (auto& task : tasks_) {
+        for (auto &task : tasks_) {
             if (t < task.arrival) continue;
             if ((t - task.arrival) % task.period == 0) {
                 ready_.emplace_back(&task, t);
@@ -58,8 +59,8 @@ public:
 
     virtual PeriodicJob* chooseJob(int t) {
         if (ready_.empty()) return nullptr;
-        PeriodicJob* best = &ready_.front();
-        for (auto& j : ready_) {
+        PeriodicJob *best = &ready_.front();
+        for (auto &j : ready_) {
             if (policy_->key(j, t) < policy_->key(*best, t)) {
                 best = &j;
             }
@@ -67,11 +68,11 @@ public:
         return best;
     }
 
-    // Bir zaman adımı
+    // Single time step
     virtual void step(int t) {
         releaseJobs(t);
         checkDeadlines(t);
-        auto* job = chooseJob(t);
+        auto *job = chooseJob(t);
         if (!job) {
             timeline_[t] = "IDLE";
             return;
@@ -102,14 +103,14 @@ public:
         out += "Missed deadlines: " + std::to_string(missed_.size()) + "\n";
         if (!missed_.empty()) {
             out += "Missed jobs:\n";
-            for (const auto& j : missed_) {
+            for (const auto &j : missed_) {
                 out += "  " + j.id + " (deadline " +
                        std::to_string(j.absDeadline) + ")\n";
             }
         }
         out += "\nGantt-like:\n";
         for (int t = 0; t < simTime_; ++t) {
-            const auto& label = timeline_[t];
+            const auto &label = timeline_[t];
             if (label == "IDLE") out += "_";
             else out += (label.size() > 1 ? label[1] : label[0]);
         }
@@ -119,7 +120,7 @@ public:
 };
 
 
-// ---------------- Background Scheduler ----------------
+// Background Scheduler
 
 class BackgroundScheduler : public PeriodicScheduler {
     std::vector<AperiodicJob> aperiodicAll_;
@@ -151,8 +152,7 @@ public:
         releaseAperiodic(t);
         checkDeadlines(t);
 
-        // önce periodic
-        auto* job = chooseJob(t);
+        auto *job = chooseJob(t);
         if (job) {
             job->remaining--;
             timeline_[t] = job->task->name;
@@ -164,9 +164,9 @@ public:
             return;
         }
 
-        // boşsa aperiodic
+        // if empty, periodic
         if (!aperiodicReady_.empty()) {
-            auto& aj = aperiodicReady_.front();
+            auto &aj = aperiodicReady_.front();
             aj.remaining--;
             timeline_[t] = aj.name;
             if (aj.remaining == 0) {

@@ -1,11 +1,12 @@
 #pragma once
 #include "sched_base.hpp"
 #include <utility>
+#include <algorithm> 
 
 class BaseServerScheduler : public PeriodicScheduler {
 protected:
-    PeriodicTask serverTask_;      
-    int Q_, T_, D_;
+    PeriodicTask serverTask_;
+    int Q_, T_, D_;  
 
     std::vector<AperiodicJob> aperiodicAll_;
     std::vector<AperiodicJob> aperiodicReady_;
@@ -24,7 +25,6 @@ public:
           Q_(cfg.Q), T_(cfg.T), D_(cfg.D),
           aperiodicAll_(aperiodic)
     {
-        // tasks + server
         tasks_ = tasks;
         tasks_.push_back(serverTask_);
 
@@ -42,6 +42,7 @@ public:
         }
     }
 
+    // Each server applies its own replenishment & consumption rule
     virtual void updateServerBudget(int t) = 0;
 
     virtual void consumeBudget(int /*t*/) {
@@ -56,7 +57,7 @@ public:
 
         auto* job = chooseJob(t);
 
-
+        // If selected job is the server itself
         if (job && job->task == &serverTask_) {
             if (serverBudget_ > 0 && !aperiodicReady_.empty()) {
                 auto& aj = aperiodicReady_.front();
@@ -68,7 +69,7 @@ public:
                 }
                 return;
             } else {
-
+                // Remove server from ready list if no budget or aperiodic task available
                 ready_.erase(std::remove_if(ready_.begin(), ready_.end(),
                     [&](const PeriodicJob& j){ return j.task == &serverTask_; }),
                     ready_.end());
@@ -76,7 +77,7 @@ public:
             }
         }
 
-        
+        // If no jobs available -> idle
         if (!job) {
             timeline_[t] = "IDLE";
             return;
@@ -100,12 +101,12 @@ public:
     using BaseServerScheduler::BaseServerScheduler;
 
     void updateServerBudget(int t) override {
-        if (t % T_ == 0) {
+        if (t % T_ == 0) {                     
             serverPeriodStart_ = t;
             if (!aperiodicReady_.empty())
                 serverBudget_ = Q_;
             else
-                serverBudget_ = 0;    // zero budget if no aperiodic task available
+                serverBudget_ = 0;            // Budget = 0 if no aperiodic task available
         }
     }
 };
@@ -118,9 +119,9 @@ public:
     using BaseServerScheduler::BaseServerScheduler;
 
     void updateServerBudget(int t) override {
-        if (t % T_ == 0) {
+        if (t % T_ == 0) {                   
             serverPeriodStart_ = t;
-            serverBudget_ = Q_;      
+            serverBudget_ = Q_;                // 100% budget at each period
         }
     }
 };
@@ -129,7 +130,9 @@ public:
 // Sporadic Server
 
 class SporadicServerScheduler : public BaseServerScheduler {
-    std::vector<std::pair<int,int>> replenishments_; // (time, amount)
+    // (time, amount)
+    std::vector<std::pair<int,int>> replenishments_;
+
 public:
     SporadicServerScheduler(const std::vector<PeriodicTask>& tasks,
                             const std::vector<AperiodicJob>& aperiodic,
@@ -142,10 +145,9 @@ public:
     }
 
     void updateServerBudget(int t) override {
-        // zamanı gelen replenishments
         for (auto it = replenishments_.begin(); it != replenishments_.end();) {
             if (it->first <= t) {
-                serverBudget_ = std::min(Q_, serverBudget_ + it->second);
+                serverBudget_ = std::min(Q_, serverBudget_ + it->second);  
                 it = replenishments_.erase(it);
             } else {
                 ++it;
