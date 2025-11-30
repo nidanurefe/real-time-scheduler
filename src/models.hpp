@@ -36,6 +36,7 @@ struct AperiodicJob {
 };
 
 // Server config: Q, T, D
+// Q = ei, T = pi, D = di 
 struct ServerCfg {
     int Q;
     int T;

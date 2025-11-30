@@ -7,6 +7,7 @@
 #include <cmath>       
 
 
+// parseInputFile -> (tasks, aperiodicJobs, optional<ServerCfg>)
 inline std::tuple<
     std::vector<PeriodicTask>,
     std::vector<AperiodicJob>,
@@ -22,7 +23,7 @@ inline std::tuple<
         throw std::runtime_error("Could not open input file: " + path);
     }
 
-    
+    // helper: double -> int (discrete time)
     auto toInt = [](double x) {
         return static_cast<int>(std::round(x));
     };
@@ -32,13 +33,13 @@ inline std::tuple<
     while (std::getline(in, raw)) {
         ++lineIdx;
 
-        // strip comments
+        // Remove comment part after '#'
         auto sharpPos = raw.find('#');
         if (sharpPos != std::string::npos) {
             raw = raw.substr(0, sharpPos);
         }
 
-        // trim leading spaces
+        // Trim leading whitespace
         std::string line;
         {
             std::stringstream ss(raw);
@@ -54,9 +55,9 @@ inline std::tuple<
 
         try {
             if (tag == "P") {
-                // P ri ei pi di
-                // P ri ei pi
-                // P ei pi
+                // P r_i e_i p_i d_i
+                // P r_i e_i p_i
+                // P e_i p_i
                 std::vector<double> nums;
                 double v;
                 while (ss >> v) nums.push_back(v);
@@ -83,7 +84,7 @@ inline std::tuple<
                 tasks.push_back(PeriodicTask{name, r_i, e_i, p_i, d_i});
             }
             else if (tag == "A") {
-                // A ri ei
+                // A r_i e_i
                 std::vector<double> nums;
                 double v;
                 while (ss >> v) nums.push_back(v);
@@ -96,16 +97,16 @@ inline std::tuple<
                 aperiodic.push_back(AperiodicJob{name, r_i, e_i, e_i});
             }
             else if (tag == "D") {
-                // D ei pi di -> server config
+                // D e_i p_i d_i  -> server config (Q, T, D)
                 std::vector<double> nums;
                 double v;
                 while (ss >> v) nums.push_back(v);
                 if (nums.size() != 3) {
                     throw std::runtime_error("D line must be: 'D ei pi di'");
                 }
-                int Q = toInt(nums[0]);
-                int T = toInt(nums[1]);
-                int D = toInt(nums[2]);
+                int Q = toInt(nums[0]);   // execution budget
+                int T = toInt(nums[1]);   // server period
+                int D = toInt(nums[2]);   // server relative deadline
                 serverCfg = ServerCfg{Q, T, D};
             }
             else {
