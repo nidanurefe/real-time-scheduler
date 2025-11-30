@@ -78,7 +78,7 @@ void MainWindow::onRunSimulation()
 
         // Scheduler
         ServerRuleConfig rules = loadServerRuleConfig("settings.json");
-        auto scheduler = buildScheduler(alg, tasks, aperiodic, serverCfg, sim, rules);
+        auto scheduler = buildScheduler(alg, tasks, aperiodic, serverCfg, sim);
 
         // Execute
         scheduler->run();

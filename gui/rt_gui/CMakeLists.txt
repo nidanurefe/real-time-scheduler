@@ -11,9 +11,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Charts)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Charts)
-target_include_directories(rt_scheduler PRIVATE
-    ../thirdparty/json/include
-)
 set(PROJECT_SOURCES
         main.cpp
         mainwindow.cpp
@@ -51,6 +48,10 @@ target_link_libraries(rt_gui PRIVATE
 target_include_directories(rt_gui PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../../src
 )
+target_include_directories(rt_gui PRIVATE
+    ../../thirdparty/json/include
+)
+
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
