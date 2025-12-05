@@ -24,7 +24,27 @@ int main() {
         std::string simStr;
         std::cout << "Simulation time (empty = hyperperiod): ";
         std::getline(std::cin, simStr);
-        int simTime = simStr.empty() ? hp : std::stoi(simStr);
+
+
+
+        int simTime = hp;  // default - hyperperiod
+        
+        if (!simStr.empty()) {
+            try {
+                simTime = std::stoi(simStr);
+                if (simTime <= 0) {
+                    std::cerr << "Simulation time must be positive. "
+                                "Falling back to hyperperiod = "
+                            << hp << "\n";
+                    simTime = hp;
+                }
+            } catch (const std::exception&) {
+                std::cerr << "Invalid simulation time input. "
+                            "Falling back to hyperperiod = "
+                        << hp << "\n";
+                simTime = hp;
+            }
+        }
 
         std::cout << "Algorithms:\n"
                   << "  EDF, RMS, DMS, LLF\n"
@@ -35,7 +55,6 @@ int main() {
         std::cout << "Algorithm: ";
         std::getline(std::cin, alg);
 
-        ServerRuleConfig rules = loadServerRuleConfig("settings.json");
         auto scheduler = buildScheduler(alg, tasks, aperiodic, serverCfg, simTime);
 
         scheduler->run();

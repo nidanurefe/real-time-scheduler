@@ -6,102 +6,161 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>804</height>
+    <width>1000</width>
+    <height>700</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Real-Time Scheduling Simulator</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QWidget" name="chartWidget" native="true">
-    <property name="geometry">
-     <rect>
-      <x>70</x>
-      <y>380</y>
-      <width>921</width>
-      <height>501</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>119</x>
-      <y>0</y>
-      <width>276</width>
-      <height>374</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
+   <layout class="QVBoxLayout" name="verticalLayoutMain">
+    <item>
+     <widget class="QGroupBox" name="groupSettings">
+      <property name="title">
+       <string>Scheduler Configuration</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayoutSettings">
+       <!-- Input file row -->
+       <item row="0" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
           <string>Input file:</string>
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QLineEdit" name="linePath"/>
-       </item>
-       <item>
-        <widget class="QPushButton" name="btnBrowse">
-         <property name="text">
-          <string>Browse</string>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="linePath">
+         <property name="placeholderText">
+          <string>Select an input file...</string>
          </property>
         </widget>
        </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <item>
+       <item row="0" column="2">
+        <widget class="QPushButton" name="btnBrowse">
+         <property name="text">
+          <string>Browse…</string>
+         </property>
+        </widget>
+       </item>
+
+       <!-- Algorithm row -->
+       <item row="1" column="0">
         <widget class="QLabel" name="label_2">
          <property name="text">
           <string>Algorithm:</string>
          </property>
         </widget>
        </item>
-       <item>
+       <item row="1" column="1">
         <widget class="QComboBox" name="comboAlg"/>
        </item>
+       <item row="1" column="2">
+        <spacer name="horizontalSpacerAlg">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+
+       <!-- Simulation time row -->
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Simulation time:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLineEdit" name="lineSim">
+         <property name="placeholderText">
+          <string>Empty = hyperperiod</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <spacer name="horizontalSpacerSim">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+
+       <!-- Run button row -->
+       <item row="3" column="0">
+        <spacer name="horizontalSpacerRunLeft">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="3" column="1">
+        <spacer name="horizontalSpacerRunMiddle">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="3" column="2">
+        <widget class="QPushButton" name="btnRun">
+         <property name="text">
+          <string>Run Simulation</string>
+         </property>
+        </widget>
+       </item>
       </layout>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="lineSim"/>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>Simulation time:</string>
+     </widget>
+    </item>
+
+    <!-- Splitter: left chart, right text output -->
+    <item>
+     <widget class="QSplitter" name="splitterMain">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QWidget" name="chartWidget" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>400</width>
+         <height>300</height>
+        </size>
        </property>
       </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btnRun">
-       <property name="text">
-        <string>Run Simulation</string>
+      <widget class="QPlainTextEdit" name="output">
+       <property name="placeholderText">
+        <string>Scheduler summary and logs will appear here…</string>
        </property>
       </widget>
-     </item>
-     <item>
-      <widget class="QPlainTextEdit" name="output"/>
-     </item>
-    </layout>
-   </widget>
+     </widget>
+    </item>
+   </layout>
   </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>800</width>
-     <height>37</height>
-    </rect>
-   </property>
-  </widget>
+
+  <widget class="QMenuBar" name="menubar"/>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>

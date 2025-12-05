@@ -164,7 +164,7 @@ public:
             return;
         }
 
-        // if empty, periodic
+        
         if (!aperiodicReady_.empty()) {
             auto &aj = aperiodicReady_.front();
             aj.remaining--;

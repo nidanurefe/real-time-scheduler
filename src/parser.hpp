@@ -6,7 +6,6 @@
 #include <stdexcept>
 #include <cmath>       
 
-
 // parseInputFile -> (tasks, aperiodicJobs, optional<ServerCfg>)
 inline std::tuple<
     std::vector<PeriodicTask>,
@@ -79,6 +78,21 @@ inline std::tuple<
                 int e_i = toInt(e_d);
                 int p_i = toInt(p_d);
                 int d_i = toInt(d_d);
+
+                // Parameter validation
+                if (p_i <= 0) {
+                    throw std::runtime_error("Periodic task period must be > 0");
+                }
+                if (e_i <= 0) {
+                    throw std::runtime_error("Execution time must be > 0");
+                }
+                if (d_i <= 0) {
+                    throw std::runtime_error("Deadline must be > 0");
+                }
+                if (r_i < 0) {
+                    throw std::runtime_error("Arrival time cannot be negative");
+                }
+
 
                 std::string name = "T" + std::to_string(tasks.size() + 1);
                 tasks.push_back(PeriodicTask{name, r_i, e_i, p_i, d_i});

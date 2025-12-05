@@ -15,13 +15,48 @@
 #include "../src/factory.hpp"
 #include "../src/models.hpp"
 
-using namespace QtCharts; 
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    setStyleSheet(R"(
+        QMainWindow {
+            background-color: #151718;
+        }
+        QGroupBox {
+            border: 1px solid #3b3f46;
+            border-radius: 6px;
+            margin-top: 10px;
+            padding-top: 15px;
+            color: #f0f0f0;
+            font-weight: 600;
+        }
+        QLabel {
+            color: #e0e0e0;
+        }
+        QLineEdit, QPlainTextEdit, QComboBox {
+            background-color: #202226;
+            border: 1px solid #3b3f46;
+            border-radius: 4px;
+            padding: 4px 6px;
+            color: #f0f0f0;
+        }
+        QPushButton {
+            background-color: #3b82f6;
+            border-radius: 4px;
+            color: white;
+            padding: 6px 14px;
+        }
+        QPushButton:hover {
+            background-color: #2563eb;
+        }
+    )");
+
+
 
     // Algorithm list
     ui->comboAlg->addItems({

@@ -33,3 +33,11 @@ CMakeLists.txt.user*
 # Temp
 *.tmp
 *~
+
+# IDE specific
+.vscode/
+.idea/
+*.swp
+
+# Compiled binaries
+*.app

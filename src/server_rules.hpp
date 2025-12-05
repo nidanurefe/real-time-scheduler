@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include <string>
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -28,13 +29,24 @@ inline ServerRuleConfig loadServerRuleConfig(const std::string& path)
 
     std::ifstream f(path);
     if (!f) {
+        std::cerr << "Warning: could not open '" << path
+                  << "'. Using default server rules.\n";
         return cfg;
     }
 
     nlohmann::json j;
-    f >> j;
+    try {
+        f >> j;
+    } catch (const std::exception& e) {
+        std::cerr << "Warning: failed to parse '" << path
+                  << "' (" << e.what()
+                  << "). Using default server rules.\n";
+        return cfg;
+    }
 
     if (!j.contains("servers")) {
+        std::cerr << "Warning: 'servers' section not found in "
+                  << path << ". Using default server rules.\n";
         return cfg;
     }
 
